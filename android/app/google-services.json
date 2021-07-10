@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "422126570658",
+    "project_id": "chat-app-e6a33",
+    "storage_bucket": "chat-app-e6a33.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:422126570658:android:e6978706d06513b25d1bfb",
+        "android_client_info": {
+          "package_name": "com.tiemporob.chat_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "422126570658-cvsa808cfqk7d9ph0cqbda7nb3qb1tat.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgnVqF_IfK2X9NFrwHew39DWyQmYeIBPU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "422126570658-cvsa808cfqk7d9ph0cqbda7nb3qb1tat.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

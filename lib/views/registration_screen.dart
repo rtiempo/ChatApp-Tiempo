@@ -1,13 +1,9 @@
 import 'package:chat_app/services/database.dart';
-import 'package:chat_app/views/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:chat_app/constants.dart';
-// ignore: import_of_legacy_library_into_null_safe
 import 'package:firebase_auth/firebase_auth.dart';
-import 'chat_screen.dart';
 import 'login_screen.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-import 'package:chat_app/models/user_model.dart';
 
 
 

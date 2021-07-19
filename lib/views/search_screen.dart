@@ -2,7 +2,9 @@ import 'dart:core';
 import 'dart:ui';
 import 'package:chat_app/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:chat_app/helpers/helperFuntions.dart';
 
 class SearchScreen extends StatefulWidget {
   static String id = 'search_screen';
@@ -15,27 +17,106 @@ class SearchScreen extends StatefulWidget {
 }
 
 class  _SearchScreenState extends State<SearchScreen> {
+  final _auth = FirebaseAuth.instance;
   DatabaseMethods databaseMethods = new DatabaseMethods();
   QuerySnapshot<Map<String, dynamic>>? searchSnapshot;
+  late User loggedInUser;
+  var local;
+  Future<int>? _query;
 
-  void getUser() {
-    print(widget.email);
+  void getUser() async {
     databaseMethods.getUserByEmail(widget.email).then((val){
-
+      setState(() {
         searchSnapshot = val;
-
+        local = searchSnapshot!.size;
+      });
+      _query = Future<int>.delayed(
+        const Duration(seconds: 3),
+          () => searchSnapshot!.size,
+      );
     });
   }
 
+  @override
+  void initState() {
+    super.initState();
+    getCurrentUser();
+    getUser();
+  }
+
+  void getCurrentUser() {
+    try {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        loggedInUser = user;
+      }
+    } catch (e) {
+      print(e);
+    }
+
+  }
+
   Widget searchList(){
-    return (searchSnapshot != null) ? ListView.builder(
+    return (local >= 1) ? ListView.builder(
       itemCount: searchSnapshot!.docs.length,
       scrollDirection: Axis.vertical,
       shrinkWrap: true,
       itemBuilder: (context, index){
-        return SearchTile(
-            username: searchSnapshot!.docs[index].data()['username'],
-            email: searchSnapshot!.docs[index].data()['email']
+        return GestureDetector(
+          onTap: () async {
+            String currentUserEmail = await HelperFunctions.getUserEmailSharedPreference() as String;
+            String currentUsername = await HelperFunctions.getUsernameSharedPreference() as String;
+
+            Map<String, String> contactMap = {
+              'username': searchSnapshot!.docs[index].data()['username'],
+              'email': searchSnapshot!.docs[index].data()['email'],
+            };
+
+            Map<String, String> contactMap2 = {
+              'username': currentUsername,
+              'email': currentUserEmail,
+            };
+
+            DocumentSnapshot snapshot = await databaseMethods.searchContacts(currentUserEmail, searchSnapshot!.docs[index].data()['email']);
+
+            if(currentUserEmail != searchSnapshot!.docs[index].data()['email']){
+              if(snapshot.exists){
+                showDialog<String>(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                    title: const Text('Error', style: TextStyle(color: Color(0xff243B53))),
+                    content: const Text('You both already have a connection.', style: TextStyle(color: Color(0xff243B53))),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, 'OK'),
+                        child: const Text('OK', style: TextStyle(color: Color(0xff3EBD93))),
+                      ),
+                    ],
+                  ),
+                );
+              }else{
+                databaseMethods.addToContacts(currentUserEmail, searchSnapshot!.docs[index].data()['email'], contactMap, contactMap2);
+              }
+            }else{
+              showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text('Error', style: TextStyle(color: Color(0xff243B53))),
+                  content: const Text('You are not allowed to add your own self.', style: TextStyle(color: Color(0xff243B53))),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'OK'),
+                      child: const Text('OK', style: TextStyle(color: Color(0xff3EBD93))),
+                    ),
+                  ],
+                ),
+              );
+            }
+          },
+          child: SearchTile(
+              username: searchSnapshot!.docs[index].data()['username'],
+              email: searchSnapshot!.docs[index].data()['email']
+          ),
         );
       }
     ) : BackdropFilter(
@@ -54,12 +135,6 @@ class  _SearchScreenState extends State<SearchScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    getUser();
-  }
-
-  @override
   Widget build(BuildContext context) {
 
     return Scaffold(
@@ -74,7 +149,26 @@ class  _SearchScreenState extends State<SearchScreen> {
               const SizedBox(
                 height: 24.0,
               ),
-              searchList(),
+              FutureBuilder<int>(
+                future: _query,
+                  builder: (BuildContext context, AsyncSnapshot<int> snapshot){
+                    List<Widget> children;
+                    if (snapshot.hasData) {
+                      children = <Widget>[
+                        searchList(),
+                      ];
+                    } else {
+                      children = <Widget>[
+                        Center(child: CircularProgressIndicator()),
+                      ];
+                    }
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: children,
+                    );
+                  },
+              ),
             ],
           ),
         ),

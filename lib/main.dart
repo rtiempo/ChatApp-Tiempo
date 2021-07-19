@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:chat_app/views/welcome_screen.dart';
 import 'package:chat_app/views/login_screen.dart';
 import 'package:chat_app/views/registration_screen.dart';
 import 'package:chat_app/views/chat_screen.dart';
-// ignore: import_of_legacy_library_into_null_safe
 import 'package:firebase_core/firebase_core.dart';
 
 
@@ -20,7 +18,7 @@ class ChatApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData.light().copyWith(
         textTheme: const TextTheme(
-          body1: TextStyle(color: Colors.black54),
+          bodyText2: TextStyle(color: Colors.black54),
         ),
       ),
       initialRoute: LoginScreen.id,

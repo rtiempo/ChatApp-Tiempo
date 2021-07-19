@@ -2,7 +2,7 @@
     package="com.tiemporob.chat_app">
    <application
         android:label="ChatApp_Tiempo"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/logo">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

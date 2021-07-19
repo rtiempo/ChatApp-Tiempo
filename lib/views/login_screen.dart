@@ -1,12 +1,13 @@
 import 'package:chat_app/constants.dart';
+import 'package:chat_app/services/database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'registration_screen.dart';
-// ignore: import_of_legacy_library_into_null_safe
 import 'package:firebase_auth/firebase_auth.dart';
 import 'chat_screen.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
-import 'package:chat_app/models/user_model.dart';
+import 'package:chat_app/helpers/helperFuntions.dart';
+import 'forgot_screen.dart';
 
 
 // ignore: use_key_in_widget_constructors
@@ -23,6 +24,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   bool showSpinner = false;
   late AnimationController controller;
   late Animation animation;
+  DatabaseMethods databaseMethods = new DatabaseMethods();
 
   TextEditingController emailTextEditingController = new TextEditingController();
   TextEditingController passwordTextEditingController = new TextEditingController();
@@ -83,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   children: [
                     TextFormField(
                       validator: (value){
-                        return value!.isEmpty || value.length < 2 ? "A valid email address is required" : null;
+                        return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!) ? null : "A valid email address is required";
                       },
                       controller: emailTextEditingController,
                       keyboardType: TextInputType.emailAddress,
@@ -123,7 +125,9 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                           primary: Colors.white,
                         ),
                         onPressed: () {
-                          print('kawaii');
+                          Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => forgot()
+                          ));
                         },
                         child: Text('Forgot Password', style: TextStyle(color: Color(0xff3EBD93))),
                       ),
@@ -175,6 +179,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                               ),
                             );
                           } else {
+                            HelperFunctions.saveUserLoggedInSharedPreference(true);
+                            HelperFunctions.saveUserEmailSharedPreference(emailTextEditingController.text);
                             Navigator.pushNamed(context, ChatScreen.id);
                           }
                         }

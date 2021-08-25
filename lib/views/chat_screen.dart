@@ -81,8 +81,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      String conversationId = (currentUsername.compareTo(snapshot.data!.docs[index].data()['username']) > 0) ?
-                        currentUsername : snapshot.data!.docs[index].data()['username'];
+                      String conversationId = (email.compareTo(snapshot.data!.docs[index].data()['email']) > 0) ?
+                        email.toString()+snapshot.data!.docs[index].data()['email'].toString() : snapshot.data!.docs[index].data()['email'].toString()+email.toString();
 
                       Navigator.push(context, MaterialPageRoute(
                           builder: (context) => ConversationScreen(conversationId: conversationId, username: snapshot.data!.docs[index].data()['username'], currentUserEmail: email,)
